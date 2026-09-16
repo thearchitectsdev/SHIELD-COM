@@ -79,6 +79,7 @@ export const PART_PARENT: Record<string, string> = {
 export function resolveOffset(
   id: string,
   partOffsets: Record<string, [number, number, number]>,
+  fade = 1,
 ): [number, number, number] {
   let x = 0
   let y = 0
@@ -95,7 +96,7 @@ export function resolveOffset(
     }
     cur = PART_PARENT[cur]
   }
-  return [x, y, z]
+  return fade === 1 ? [x, y, z] : [x * fade, y * fade, z * fade]
 }
 
 /* every part that rides along when `id` is moved */
@@ -176,6 +177,8 @@ type Viewer = {
   freeMove: boolean
   setFreeMove: (v: boolean) => void
   partOffsets: Record<string, [number, number, number]>
+  offsetFade: number
+  assembleAll: () => void
   setPartOffset: (id: string, offset: [number, number, number]) => void
   setPartOffsetAbs: (id: string, offset: [number, number, number]) => void
   resetPartOffset: (id: string) => void
@@ -223,6 +226,37 @@ export function ViewerProvider({ children }: { children: React.ReactNode }) {
   const [isolate, setIsolate] = useState(true)
   const [freeMove, setFreeMove] = useState(false)
   const [partOffsets, setPartOffsets] = useState<Record<string, [number, number, number]>>({})
+  const [offsetFade, setOffsetFade] = useState(1)
+  const partOffsetsRef = useRef(partOffsets)
+  partOffsetsRef.current = partOffsets
+  const fadeRaf = useRef<number | null>(null)
+
+  /*  ASSEMBLE — every part that was dragged with FREE MOVE glides back to
+      its true position.  One scalar fade drives all offsets at once, so the
+      whole model returns together instead of snapping.                     */
+  const assembleAll = useCallback(() => {
+    if (Object.keys(partOffsetsRef.current).length === 0) return
+    if (fadeRaf.current !== null) cancelAnimationFrame(fadeRaf.current)
+    const t0 = performance.now()
+    const dur = 420
+    const step = () => {
+      const k = Math.min(1, (performance.now() - t0) / dur)
+      const e = 1 - Math.pow(1 - k, 3)
+      setOffsetFade(1 - e)
+      if (k < 1) {
+        fadeRaf.current = requestAnimationFrame(step)
+      } else {
+        fadeRaf.current = null
+        setPartOffsets({})
+        setOffsetFade(1)
+      }
+    }
+    fadeRaf.current = requestAnimationFrame(step)
+  }, [])
+
+  useEffect(() => () => {
+    if (fadeRaf.current !== null) cancelAnimationFrame(fadeRaf.current)
+  }, [])
 
   const setPartOffset = useCallback((id: string, offset: [number, number, number]) => {
     setPartOffsets((prev) => ({
@@ -283,6 +317,17 @@ export function ViewerProvider({ children }: { children: React.ReactNode }) {
     anim.current.tp = mode === 'pcb' && pcbExplode ? 1 : 0
     clipPlane.constant = mode === 'slice' ? clip : 100
   }, [mode, clip, clipPlane, pcbExplode])
+
+  /* Switching view re-assembles the model: each mode is a canonical pose, so
+     manual FREE MOVE displacements are folded back in as you change mode. */
+  const modeFirst = useRef(true)
+  useEffect(() => {
+    if (modeFirst.current) {
+      modeFirst.current = false
+      return
+    }
+    assembleAll()
+  }, [mode, assembleAll])
 
   /* PCB DETAIL opens the inspection chamber AND lifts the component stack —
      the board settles first, then every package rises by its real height. */
@@ -393,6 +438,8 @@ export function ViewerProvider({ children }: { children: React.ReactNode }) {
     freeMove,
     setFreeMove,
     partOffsets,
+    offsetFade,
+    assembleAll,
     setPartOffset,
     setPartOffsetAbs,
     resetPartOffset,
@@ -508,7 +555,7 @@ export const P = React.forwardRef<THREE.Mesh, PProps>(function P(
   { id, mat = M.steel, clip = false, shell = false, geometry, children, position, ...rest },
   ref,
 ) {
-  const { selected, hovered, setSelected, setHovered, mode, partOffsets, freeMove } = useViewer()
+  const { selected, hovered, setSelected, setHovered, mode, partOffsets, offsetFade, freeMove } = useViewer()
   const isRadio = id === 'host-radio'
   const active = selected === id
   const hover = hovered === id
@@ -540,7 +587,7 @@ export const P = React.forwardRef<THREE.Mesh, PProps>(function P(
   }, [id])
 
   /* own offset + every ancestor's offset, so children ride with their parent */
-  const offset = resolveOffset(id, partOffsets)
+  const offset = resolveOffset(id, partOffsets, offsetFade)
   const finalPos: [number, number, number] | undefined = position
     ? [position[0] + offset[0], position[1] + offset[1], position[2] + offset[2]]
     : offset[0] !== 0 || offset[1] !== 0 || offset[2] !== 0

@@ -53,6 +53,61 @@ function AutoOrbit({ controls }: { controls: React.RefObject<React.ComponentRef<
   return null
 }
 
+/* studio cyclorama — a real surface all around the model instead of an
+   empty gradient: dark at the crown, a soft olive pool of light behind
+   the module, falling off to near-black at the floor. Unlit, untonemapped,
+   so it stays exactly as designed and never fights the product lighting. */
+function useCyclorama() {
+  return useMemo(() => {
+    const c = document.createElement('canvas')
+    c.width = c.height = 512
+    const g = c.getContext('2d')
+    if (g) {
+      const v = g.createLinearGradient(0, 0, 0, 512)
+      v.addColorStop(0.0, '#050705')
+      v.addColorStop(0.34, '#0b0f0a')
+      v.addColorStop(0.55, '#141a12')
+      v.addColorStop(0.68, '#191f15')
+      v.addColorStop(0.82, '#0d110c')
+      v.addColorStop(1.0, '#070907')
+      g.fillStyle = v
+      g.fillRect(0, 0, 512, 512)
+      /* soft bounce behind the product */
+      const r = g.createRadialGradient(256, 352, 0, 256, 352, 250)
+      r.addColorStop(0, 'rgba(150,168,120,0.20)')
+      r.addColorStop(0.45, 'rgba(120,140,96,0.09)')
+      r.addColorStop(1, 'rgba(0,0,0,0)')
+      g.fillStyle = r
+      g.fillRect(0, 0, 512, 512)
+    }
+    const t = new THREE.CanvasTexture(c)
+    t.colorSpace = THREE.SRGBColorSpace
+    return t
+  }, [])
+}
+
+/* radial falloff texture for the studio deck */
+function useDeckFade() {
+  return useMemo(() => {
+    const c = document.createElement('canvas')
+    c.width = c.height = 512
+    const g = c.getContext('2d')
+    if (g) {
+      const grd = g.createRadialGradient(256, 256, 0, 256, 256, 256)
+      grd.addColorStop(0, 'rgba(255,255,255,0)')
+      grd.addColorStop(0.32, 'rgba(255,255,255,0)')
+      grd.addColorStop(0.62, 'rgba(255,255,255,0.55)')
+      grd.addColorStop(0.85, 'rgba(255,255,255,0.92)')
+      grd.addColorStop(1, 'rgba(255,255,255,1)')
+      g.fillStyle = grd
+      g.fillRect(0, 0, 512, 512)
+    }
+    const t = new THREE.CanvasTexture(c)
+    t.colorSpace = THREE.NoColorSpace
+    return t
+  }, [])
+}
+
 /* ------------------------------------------------------------------ */
 /*  SECTION PLANE                                                      */
 /* ------------------------------------------------------------------ */
@@ -444,6 +499,12 @@ function DemoDirector() {
   const t = useRef(0)
   const chapter = useRef(-1)
   const uiTick = useRef(0)
+  /* wall-clock timing: the demo runs for 32.5 real seconds no matter how
+     many frames the device can actually draw (the old per-frame accumulator
+     crawled on slow GPUs and made the tour drag on for minutes) */
+  const anchor = useRef<number | null>(null)
+  const acc = useRef(0)
+  const uiClock = useRef(-1)
 
   const runChapter = useMemo(
     () => (i: number) => {
@@ -489,24 +550,39 @@ function DemoDirector() {
     [setSelected, setMode, setAutoRotate, focus, clipRef, setClip],
   )
 
-  useFrame((_state, dt) => {
+  useFrame(() => {
     if (!demo) {
       t.current = 0
       chapter.current = -1
+      anchor.current = null
+      acc.current = 0
       return
     }
     if (restartRef.current) {
       restartRef.current = false
       t.current = 0
       chapter.current = -1
+      acc.current = 0
+      anchor.current = null
     }
     if (seekRef.current !== null) {
       const want = seekRef.current
       seekRef.current = null
-      t.current = CHAPTERS[want].t + 0.01
+      acc.current = CHAPTERS[want].t + 0.01
+      t.current = acc.current
       chapter.current = -1
+      anchor.current = null
     }
-    if (!demoPaused) t.current += Math.min(dt, 0.05)
+    if (demoPaused) {
+      /* freeze: bank the elapsed time and drop the anchor */
+      if (anchor.current !== null) {
+        acc.current = t.current
+        anchor.current = null
+      }
+    } else {
+      if (anchor.current === null) anchor.current = performance.now()
+      t.current = acc.current + (performance.now() - anchor.current) / 1000
+    }
 
     let idx = 0
     for (let i = 0; i < CHAPTERS.length; i++) if (t.current >= CHAPTERS[i].t) idx = i
@@ -522,7 +598,12 @@ function DemoDirector() {
       if (uiTick.current % 3 === 0) setClip(clipRef.current)
     }
     uiTick.current++
-    if (uiTick.current % 4 === 0) setDemoT(Math.min(t.current, DEMO_END))
+    /* refresh the readout on a time step, not a frame count, so the clock
+       stays honest even when the renderer is struggling */
+    if (Math.abs(t.current - uiClock.current) > 0.08) {
+      uiClock.current = t.current
+      setDemoT(Math.min(t.current, DEMO_END))
+    }
     if (t.current > DEMO_END) {
       setDemo(false)
       autoRotateAfter()
@@ -541,6 +622,8 @@ function DemoDirector() {
 export default function Scene() {
   const controls = useRef<React.ComponentRef<typeof OrbitControls>>(null)
   const { setSelected } = useViewer()
+  const deckFade = useDeckFade()
+  const cyclorama = useCyclorama()
   return (
     <>
       <StudioEnv />
@@ -586,12 +669,30 @@ export default function Scene() {
       <SlicePlane />
       <Labels />
 
+      {/* solid studio surroundings */}
+      <mesh scale={[1, 1, 1]} renderOrder={-2}>
+        <sphereGeometry args={[200, 48, 32]} />
+        <meshBasicMaterial map={cyclorama} side={THREE.BackSide} toneMapped={false} depthWrite={false} />
+      </mesh>
+
       <ContactShadows position={[4, -2.52, 0]} opacity={0.62} scale={44} blur={2.2} far={9} resolution={1024} />
-      {/* satin studio deck with a faint reflective sheen */}
-      {/* single satin studio deck — every object stands ON it (nothing is cut by it) */}
+      {/* solid studio deck — runs out to the horizon so the module sits on a
+          real surface instead of floating in an empty gradient */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[4, -2.54, 0]} receiveShadow>
-        <planeGeometry args={[160, 160]} />
-        <meshStandardMaterial color="#0e120c" roughness={0.52} metalness={0.45} envMapIntensity={0.22} />
+        <planeGeometry args={[900, 900]} />
+        <meshStandardMaterial color="#111510" roughness={0.6} metalness={0.32} envMapIntensity={0.3} />
+      </mesh>
+      {/* soft pool of light that dissolves the deck into the backdrop, so the
+          ground reads as depth rather than ending at a hard horizon line */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[4, -2.53, 0]} renderOrder={-1}>
+        <planeGeometry args={[420, 420]} />
+        <meshBasicMaterial
+          color="#090c0a"
+          transparent
+          opacity={0.92}
+          alphaMap={deckFade}
+          depthWrite={false}
+        />
       </mesh>
 
       <OrbitControls

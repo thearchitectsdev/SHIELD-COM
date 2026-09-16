@@ -1037,6 +1037,7 @@ function Shell() {
     setFreeMove,
     partOffsets,
     resetPartOffsets,
+    assembleAll,
   } = useViewer()
 
   const [ready, setReady] = useState(false)
@@ -1117,11 +1118,26 @@ function Shell() {
       if (e.target instanceof HTMLInputElement) return
       const k = e.key.toLowerCase()
       if (k === 'escape') setSelected(null)
-      else if (k === '1') setMode('assembled')
-      else if (k === '2') setMode('exploded')
-      else if (k === '3') setMode('slice')
-      else if (k === '4') setMode('pcb')
-      else if (k === '5') setMode('internal')
+      else if (k === '1') {
+        setMode('assembled')
+        assembleAll()
+      }
+      else if (k === '2') {
+        setMode('exploded')
+        assembleAll()
+      }
+      else if (k === '3') {
+        setMode('slice')
+        assembleAll()
+      }
+      else if (k === '4') {
+        setMode('pcb')
+        assembleAll()
+      }
+      else if (k === '5') {
+        setMode('internal')
+        assembleAll()
+      }
       else if (k === 'f') setPcbFace(pcbFace === 'top' ? 'bottom' : 'top')
       else if (k === 'i') setIsolate(!isolate)
       else if (k === 'm') setFreeMove(!freeMove)
@@ -1317,6 +1333,7 @@ function Shell() {
                     onClick={() => {
                       setOption(null)
                       setMode(m.id)
+                      assembleAll()
                     }}
                     className={`btn ${mode === m.id ? 'on' : ''}`}
                   >
