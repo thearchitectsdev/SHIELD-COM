@@ -1,0 +1,10 @@
+node_modules/
+dist/
+dist-single/
+.vite/
+*.local
+.DS_Store
+model.zip
+.env
+.env.*
+!.env.example
