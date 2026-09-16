@@ -1,5 +1,5 @@
 import { M, DIM } from '../lib/materials'
-import { Box, Cyl, Ring } from '../lib/viewer'
+import { Box, Cyl } from '../lib/viewer'
 
 const OX = DIM.ox // 3.6
 const OZ = DIM.oz // 2.5
@@ -12,13 +12,20 @@ const CROWN = DIM.crown // 0.72
     Holes are: LED window, power switch slot, SOS, MARK, MIC1, MIC2   */
 const CEIL: [number, number, [number, number][]][] = [
   [-OZ, -2.075, [[-OX, OX]]],
-  [-2.075, -1.5, [[-OX, -1.45], [-0.55, 0.35], [2.15, OX]]],
-  [-1.5, -1.4, [[-OX, OX]]],
-  [-1.4, -0.3, [[-OX, -2.9], [-1.8, OX]]],
-  [-0.3, 0.0, [[-OX, OX]]],
-  [0.0, 0.9, [[-OX, -2.8], [-1.9, OX]]],
-  [0.9, 0.95, [[-OX, OX]]],
-  [0.95, 1.65, [[-OX, -1.25], [-0.55, 2.37], [3.07, OX]]],
+  /* power-switch slot + LED window band */
+  [-2.075, -1.75, [[-OX, -1.45], [-0.55, 0.35], [2.15, OX]]],
+  /* same band with the SOS aperture opened on the left */
+  [-1.75, -1.5, [[-OX, -3.25], [-1.65, -1.45], [-0.55, 0.35], [2.15, OX]]],
+  /* SOS aperture */
+  [-1.5, -0.15, [[-OX, -3.25], [-1.65, OX]]],
+  /* solid web between the two controls */
+  [-0.15, 0.3, [[-OX, OX]]],
+  /* MARK aperture */
+  [0.3, 0.95, [[-OX, -3.1], [-1.8, OX]]],
+  /* MARK + both microphone ports */
+  [0.95, 1.6, [[-OX, -3.1], [-1.8, -1.25], [-0.55, 2.37], [3.07, OX]]],
+  /* microphone ports only */
+  [1.6, 1.65, [[-OX, -1.25], [-0.55, 2.37], [3.07, OX]]],
   [1.65, OZ, [[-OX, OX]]],
 ]
 
@@ -88,7 +95,7 @@ export function UpperEnclosure() {
       ))}
 
       {/* ---- protective ribs on the top face ---- */}
-      {[-1.52, 1.72].map((z, i) => (
+      {[-2.28, 2.28].map((z, i) => (
         <Box key={i} id="upper-enclosure" mat={M.shellTop} clip shell size={[6.2, 0.07, 0.18]} position={[0, 1.435, z]} />
       ))}
 
@@ -104,14 +111,20 @@ export function UpperEnclosure() {
       <Box id="upper-enclosure" mat={M.seam} clip shell size={[0.012, 0.045, 5.01]} position={[-3.6, 0.855, 0]} />
       <Box id="upper-enclosure" mat={M.seam} clip shell size={[0.012, 0.045, 5.01]} position={[3.6, 0.855, 0]} />
 
-      {/* ---- SOS guard bezel ---- */}
-      <Ring id="upper-enclosure" mat={M.shellTop} clip shell rO={0.78} rI={0.55} h={0.18} position={[-2.35, 1.4, -0.85]} />
-      {/* ---- MARK guard bezel ---- */}
-      <Ring id="upper-enclosure" mat={M.shellTop} clip shell rO={0.62} rI={0.45} h={0.16} position={[-2.35, 1.4, 0.45]} />
-
-      {/* ---- microphone port retaining rings (stainless) ---- */}
-      <Ring id="upper-enclosure" mat={M.steel} clip shell rO={0.35} rI={0.29} h={0.07} position={[2.72, 1.33, 1.3]} />
-      <Ring id="upper-enclosure" mat={M.steel} clip shell rO={0.35} rI={0.29} h={0.07} position={[-0.9, 1.33, 1.3]} />
+      {/* ---- square microphone port retaining frames (stainless) ----
+           square to match the square apertures, so no corner of the
+           opening is left uncovered */}
+      {[
+        [2.72, 1.3],
+        [-0.9, 1.3],
+      ].map(([x, z], i) => (
+        <group key={i}>
+          <Box id="upper-enclosure" mat={M.steel} clip shell size={[0.78, 0.07, 0.09]} position={[x, 1.375, z - 0.355]} />
+          <Box id="upper-enclosure" mat={M.steel} clip shell size={[0.78, 0.07, 0.09]} position={[x, 1.375, z + 0.355]} />
+          <Box id="upper-enclosure" mat={M.steel} clip shell size={[0.09, 0.07, 0.62]} position={[x - 0.345, 1.375, z]} />
+          <Box id="upper-enclosure" mat={M.steel} clip shell size={[0.09, 0.07, 0.62]} position={[x + 0.345, 1.375, z]} />
+        </group>
+      ))}
 
     </group>
   )

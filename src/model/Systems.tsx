@@ -227,11 +227,28 @@ export function AcousticDucts() {
   )
 }
 
+/* Square woven discs: the lid apertures are square, so a round mesh left the
+   corners of the opening exposing the internals. Cut to the aperture instead. */
 export function AcousticMesh() {
   return (
     <group>
-      <Cyl id="acoustic-mesh" mat={M.meshDisc} r={0.32} h={0.03} position={[2.72, 1.275, 1.3]} />
-      <Cyl id="acoustic-mesh" mat={M.meshDisc} r={0.32} h={0.03} position={[-0.9, 1.275, 1.3]} />
+      {[
+        [2.72, 1.3],
+        [-0.9, 1.3],
+      ].map(([x, z], i) => (
+        <group key={i}>
+          <Box id="acoustic-mesh" mat={M.meshDisc} size={[0.68, 0.03, 0.68]} position={[x, 1.261, z]} />
+          {/* crossed strands read as woven wire over the aperture */}
+          {[-0.18, -0.06, 0.06, 0.18].map((o, j) => (
+            <Box key={`x${j}`} id="acoustic-mesh" mat={M.meshDisc} size={[0.016, 0.012, 0.68]} position={[x + o, 1.27, z]} />
+          ))}
+          {[-0.18, -0.06, 0.06, 0.18].map((o, j) => (
+            <Box key={`z${j}`} id="acoustic-mesh" mat={M.meshDisc} size={[0.68, 0.012, 0.016]} position={[x, 1.27, z + o]} />
+          ))}
+          {/* hydrophobic backing screen under the weave */}
+          <Box id="acoustic-mesh" mat={M.gasket} size={[0.72, 0.02, 0.72]} position={[x, 1.238, z]} />
+        </group>
+      ))}
     </group>
   )
 }
@@ -239,36 +256,57 @@ export function AcousticMesh() {
 /* ================================================================== */
 /*  CONTROLS                                                           */
 /* ================================================================== */
+/* Glove-friendly control geometry, per MIL-STD-1472:
+   - caps stand proud of the lid instead of sitting sunk in a bore
+   - 13 mm SOS cap / 10 mm MARK cap on raised square escutcheons
+   - 19 mm centre-to-centre so a gloved thumb cannot bridge both
+   - each escutcheon fills its lid aperture, so nothing inside is visible  */
 export function SosButton() {
+  const x = -2.45
+  const z = -0.95
   return (
     <group>
-      <Box id="sos-button" mat={M.darkPoly} size={[0.6, 0.25, 0.6]} position={[-2.35, 0.565, -0.85]} />
-      <Cyl id="sos-button" mat={M.steel} r={0.1} h={0.06} position={[-2.35, 0.72, -0.85]} />
-      <Cyl id="sos-button" mat={M.shellIn} r={0.13} h={0.37} position={[-2.35, 0.935, -0.85]} />
-      <Box id="sos-button" mat={M.shellIn} size={[0.32, 0.37, 0.06]} position={[-2.35, 0.935, -0.85]} />
-      <Box id="sos-button" mat={M.shellIn} size={[0.06, 0.37, 0.32]} position={[-2.35, 0.935, -0.85]} />
-      <Cyl id="sos-button" mat={M.sos} r={0.48} h={0.18} position={[-2.35, 1.21, -0.85]} />
-      <Cyl id="sos-button" mat={M.sosDark} r={0.34} h={0.025} position={[-2.35, 1.302, -0.85]} />
-      <Ring id="sos-button" mat={M.sosDark} rO={0.48} rI={0.43} h={0.03} position={[-2.35, 1.12, -0.85]} />
-      {/* machined surround ring seated in the bezel bore */}
-      <Ring id="sos-button" mat={M.sosRing} rO={0.55} rI={0.5} h={0.1} position={[-2.35, 1.22, -0.85]} />
+      {/* actuator stack */}
+      <Box id="sos-button" mat={M.darkPoly} size={[0.6, 0.25, 0.6]} position={[x, 0.565, z]} />
+      <Cyl id="sos-button" mat={M.steel} r={0.1} h={0.06} position={[x, 0.72, z]} />
+      <Cyl id="sos-button" mat={M.shellIn} r={0.13} h={0.37} position={[x, 0.935, z]} />
+      <Box id="sos-button" mat={M.shellIn} size={[0.32, 0.37, 0.06]} position={[x, 0.935, z]} />
+      <Box id="sos-button" mat={M.shellIn} size={[0.06, 0.37, 0.32]} position={[x, 0.935, z]} />
+      {/* square escutcheon, 1 mm proud of the lid, sealing the aperture */}
+      <Box id="sos-button" mat={M.shellTop} shell clip size={[1.72, 0.1, 1.72]} position={[x, 1.45, z]} />
+      {/* guard rim standing above the cap: blocks accidental side presses */}
+      <Box id="sos-button" mat={M.sosRing} size={[1.72, 0.12, 0.1]} position={[x, 1.56, z - 0.81]} />
+      <Box id="sos-button" mat={M.sosRing} size={[1.72, 0.12, 0.1]} position={[x, 1.56, z + 0.81]} />
+      <Box id="sos-button" mat={M.sosRing} size={[0.1, 0.12, 1.62]} position={[x - 0.81, 1.56, z]} />
+      <Box id="sos-button" mat={M.sosRing} size={[0.1, 0.12, 1.62]} position={[x + 0.81, 1.56, z]} />
+      {/* cap, 13 mm across, standing 1 mm proud of the escutcheon */}
+      <Cyl id="sos-button" mat={M.sos} r={0.65} h={0.2} position={[x, 1.5, z]} />
+      <Cyl id="sos-button" mat={M.sosDark} r={0.46} h={0.025} position={[x, 1.605, z]} />
+      <Ring id="sos-button" mat={M.sosDark} rO={0.65} rI={0.58} h={0.03} position={[x, 1.6, z]} />
     </group>
   )
 }
 
 export function MarkButton() {
+  const x = -2.45
+  const z = 0.95
   return (
     <group>
-      <Box id="mark-button" mat={M.darkPoly} size={[0.55, 0.22, 0.55]} position={[-2.35, 0.55, 0.45]} />
-      <Cyl id="mark-button" mat={M.steel} r={0.09} h={0.05} position={[-2.35, 0.685, 0.45]} />
-      <Cyl id="mark-button" mat={M.shellIn} r={0.11} h={0.43} position={[-2.35, 0.925, 0.45]} />
-      <Box id="mark-button" mat={M.shellIn} size={[0.27, 0.43, 0.05]} position={[-2.35, 0.925, 0.45]} />
-      <Box id="mark-button" mat={M.shellIn} size={[0.05, 0.43, 0.27]} position={[-2.35, 0.925, 0.45]} />
-      <Cyl id="mark-button" mat={M.mark} r={0.39} h={0.14} position={[-2.35, 1.21, 0.45]} />
-      <Box id="mark-button" mat={M.markRib} size={[0.52, 0.03, 0.1]} position={[-2.35, 1.295, 0.45]} />
-      <Box id="mark-button" mat={M.markRib} size={[0.1, 0.03, 0.52]} position={[-2.35, 1.295, 0.45]} />
-      {/* machined surround ring seated in the bezel bore */}
-      <Ring id="mark-button" mat={M.sosRing} rO={0.45} rI={0.41} h={0.09} position={[-2.35, 1.22, 0.45]} />
+      <Box id="mark-button" mat={M.darkPoly} size={[0.55, 0.22, 0.55]} position={[x, 0.55, z]} />
+      <Cyl id="mark-button" mat={M.steel} r={0.09} h={0.05} position={[x, 0.685, z]} />
+      <Cyl id="mark-button" mat={M.shellIn} r={0.11} h={0.43} position={[x, 0.925, z]} />
+      <Box id="mark-button" mat={M.shellIn} size={[0.27, 0.43, 0.05]} position={[x, 0.925, z]} />
+      <Box id="mark-button" mat={M.shellIn} size={[0.05, 0.43, 0.27]} position={[x, 0.925, z]} />
+      {/* square escutcheon sealing the aperture */}
+      <Box id="mark-button" mat={M.shellTop} shell clip size={[1.42, 0.1, 1.42]} position={[x, 1.45, z]} />
+      <Box id="mark-button" mat={M.sosRing} size={[1.42, 0.1, 0.09]} position={[x, 1.55, z - 0.665]} />
+      <Box id="mark-button" mat={M.sosRing} size={[1.42, 0.1, 0.09]} position={[x, 1.55, z + 0.665]} />
+      <Box id="mark-button" mat={M.sosRing} size={[0.09, 0.1, 1.33]} position={[x - 0.665, 1.55, z]} />
+      <Box id="mark-button" mat={M.sosRing} size={[0.09, 0.1, 1.33]} position={[x + 0.665, 1.55, z]} />
+      {/* cap, 10 mm across, proud of the escutcheon */}
+      <Cyl id="mark-button" mat={M.mark} r={0.5} h={0.18} position={[x, 1.49, z]} />
+      <Box id="mark-button" mat={M.markRib} size={[0.64, 0.03, 0.08]} position={[x, 1.585, z]} />
+      <Box id="mark-button" mat={M.markRib} size={[0.08, 0.03, 0.64]} position={[x, 1.585, z]} />
     </group>
   )
 }
@@ -279,9 +317,12 @@ export function PowerSwitch() {
       <Box id="power-switch" mat={M.darkPoly} size={[0.9, 0.28, 0.5]} position={[-1.0, 0.58, -1.75]} />
       <Box id="power-switch" mat={M.steel} size={[0.5, 0.06, 0.26]} position={[-1.0, 0.75, -1.75]} />
       <Box id="power-switch" mat={M.shellIn} size={[0.2, 0.44, 0.2]} position={[-1.0, 0.94, -1.75]} />
-      <Box id="power-switch" mat={M.mark} size={[0.34, 0.2, 0.3]} position={[-1.0, 1.26, -1.75]} />
-      <Box id="power-switch" mat={M.markRib} size={[0.26, 0.035, 0.05]} position={[-1.0, 1.372, -1.83]} />
-      <Box id="power-switch" mat={M.markRib} size={[0.26, 0.035, 0.05]} position={[-1.0, 1.372, -1.67]} />
+      {/* slider sized to the slot: closes the opening into the enclosure */}
+      <Box id="power-switch" mat={M.mark} size={[0.86, 0.16, 0.53]} position={[-1.0, 1.32, -1.7875]} />
+      {/* raised ridges so a gloved thumb can find and drive it */}
+      <Box id="power-switch" mat={M.markRib} size={[0.62, 0.05, 0.06]} position={[-1.0, 1.425, -1.97]} />
+      <Box id="power-switch" mat={M.markRib} size={[0.62, 0.05, 0.06]} position={[-1.0, 1.425, -1.85]} />
+      <Box id="power-switch" mat={M.markRib} size={[0.62, 0.05, 0.06]} position={[-1.0, 1.425, -1.73]} />
     </group>
   )
 }
@@ -293,7 +334,7 @@ export function LightPipes() {
         <Cyl key={i} id="light-pipes" mat={M.lightPipe} r={0.105} h={0.76} position={[x, 0.88, -1.8]} />
       ))}
       {/* recessed window sits 0.5 mm below the machined bezel frame */}
-      <Box id="light-pipes" mat={M.window} size={[1.8, 0.1, 0.425]} position={[1.25, 1.3, -1.8625]} />
+      <Box id="light-pipes" mat={M.window} size={[1.84, 0.1, 0.58]} position={[1.25, 1.3, -1.7875]} />
       <Box id="light-pipes" mat={M.windowBezel} size={[1.92, 0.05, 0.06]} position={[1.25, 1.39, -2.1]} />
       <Box id="light-pipes" mat={M.windowBezel} size={[1.92, 0.05, 0.06]} position={[1.25, 1.39, -1.625]} />
       <Box id="light-pipes" mat={M.windowBezel} size={[0.06, 0.05, 0.535]} position={[0.32, 1.39, -1.8625]} />

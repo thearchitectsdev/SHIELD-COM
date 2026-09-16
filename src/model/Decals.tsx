@@ -134,12 +134,12 @@ export function TopMarkings() {
         <meshBasicMaterial map={leds} transparent depthWrite={false} polygonOffset polygonOffsetFactor={-2} />
       </mesh>
       {/* SOS / MARK bezel captions printed on the lid beside each guard */}
-      <mesh rotation={flat} position={[-2.35, 1.406, -1.79]} raycast={() => null}>
-        <planeGeometry args={[0.68, 0.3]} />
+      <mesh rotation={flat} position={[-2.45, 1.406, -2.0]} raycast={() => null}>
+        <planeGeometry args={[0.56, 0.24]} />
         <meshBasicMaterial map={sos} transparent depthWrite={false} polygonOffset polygonOffsetFactor={-2} />
       </mesh>
-      <mesh rotation={flat} position={[-2.35, 1.406, 1.33]} raycast={() => null}>
-        <planeGeometry args={[0.6, 0.26]} />
+      <mesh rotation={flat} position={[-2.45, 1.406, 1.9]} raycast={() => null}>
+        <planeGeometry args={[0.5, 0.22]} />
         <meshBasicMaterial map={mark} transparent depthWrite={false} polygonOffset polygonOffsetFactor={-2} />
       </mesh>
     </group>

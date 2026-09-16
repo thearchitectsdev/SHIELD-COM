@@ -14,6 +14,7 @@ import {
   PowerSection,
   StatusLeds,
 } from './Pcb'
+import { PttButton, SpeakerDriver, SpeakerGrille } from './Tactical'
 import {
   AcousticDucts,
   AcousticGaskets,
@@ -141,6 +142,17 @@ export function ShieldCom() {
       </Assy>
       <Assy ex={[0, -2.95, 0]}>
         <ThreadedInserts />
+      </Assy>
+
+      {/* ============ TACTICAL HANDSET PACKAGE ============ */}
+      <Assy ex={[0, 0, -2.1]}>
+        <SpeakerGrille />
+      </Assy>
+      <Assy ex={[0, 0, -1.6]}>
+        <SpeakerDriver />
+      </Assy>
+      <Assy ex={[-2.1, 0, 0]}>
+        <PttButton />
       </Assy>
 
       {/* ============ EXTERNAL INTERFACES ============ */}

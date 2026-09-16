@@ -606,9 +606,10 @@ export const PARTS: Record<string, PartInfo> = {
     role: 'The environmental barrier for the acoustic path – essential for a device used in dust, mud and rain.',
     details: [
       '316L stainless woven mesh, 40 µm aperture, 2 off',
+      'Cut square to the square lid aperture — no open corners',
       'Backed by a hydrophobic ePTFE membrane',
       '< 1 dB insertion loss below 10 kHz',
-      'Captured by a pressed stainless retaining ring',
+      'Captured by a square pressed stainless retaining frame',
     ],
     focus: F(2.72, 1.3, 1.3, [0.9, 1.2, 0.9]),
   },
@@ -806,7 +807,73 @@ export const PARTS: Record<string, PartInfo> = {
     ],
     focus: F(10.6, 9.0, 0, [1.0, 0.3, 1.0]),
   },
-}
+
+  /* ================= EXTERNAL HARDWARE ================= */
+  'speaker-grille': {
+    name: 'WATER-SHEDDING SPEAKER GRILLE',
+    branch: 'Tactical Handset › Audio Out',
+    kind: 'hardware',
+    func: 'Protective outlet for the loudspeaker: five horizontal slots, each capped by a lip so rain and melt-water run off instead of pooling in the aperture.',
+    loc: 'Front wall of the lower shell, centred at (X = 0, Y = −5.5 mm), recessed between the grip ribs.',
+    role: 'Lets audio out while keeping water, sand and debris out — the classic handset speaker aperture.',
+    specs: {
+      dimensions: '31.0 × 7.4 mm aperture, 5 × 1.3 mm slots',
+      weight: '1.4 g',
+      material: 'Stainless surround, moulded PC/ABS slats',
+      interface: 'Sits over a 20 mm driver',
+      temperature: '-40 °C to +85 °C',
+    },
+    details: [
+      'Horizontal slots with a shed lip above each one',
+      'Recessed behind the grip ribs so it never rests flat on a surface',
+      'Stainless surround bonded to the shell wall',
+      'Backed by a hydrophobic screen on the driver',
+    ],
+    focus: F(0, -0.55, -2.55, [-0.4, -0.6, -2.4]),
+  },
+  'speaker-driver': {
+    name: 'SPEAKER DRIVER',
+    branch: 'Tactical Handset › Audio Out',
+    kind: 'hardware',
+    func: '20 mm moving-coil loudspeaker that reproduces received audio at the operator’s ear.',
+    loc: 'Inside the lower shell directly behind the grille, (X = 0, Y = −5.5 mm, Z = −19 mm).',
+    role: 'The audio output transducer — the part that makes the module a two-way device rather than a recorder.',
+    specs: {
+      dimensions: 'Ø 20 mm × 6.4 mm deep',
+      weight: '3.2 g',
+      material: 'Neodymium magnet, mylar cone, steel basket',
+      voltage: '2.0 W into 8 Ω, 700 mW nominal',
+      temperature: '-40 °C to +70 °C',
+    },
+    details: [
+      'Neodymium motor keeps it 6.4 mm deep',
+      'Bonded to the front wall with a closed-cell gasket',
+      'Hydrophobic screen behind the grille stops water reaching the cone',
+      'Driven from the audio codec DAC through a Class-D stage',
+    ],
+    focus: F(0, -0.55, -1.9, [0.4, -0.4, -1.4]),
+  },
+  'ptt-button': {
+    name: 'PTT PAD (SIDE)',
+    branch: 'Tactical Handset › Controls',
+    kind: 'hardware',
+    func: 'Push-to-talk pad on the side of the shell, operated by the thumb while the radio stays holstered.',
+    loc: '−X wall at (Y = 0, Z = +14 mm), standing 1.8 mm proud of the shell.',
+    role: 'The most-used control in the field, so it is the largest target on the device and sits proud rather than in a bore.',
+    specs: {
+      dimensions: '13.6 × 8.6 mm pad, 1.8 mm proud',
+      weight: '0.9 g',
+      material: 'TPE over a polycarbonate plunger',
+      interface: 'Momentary tactile switch, 2.8 N actuation',
+    },
+    details: [
+      'Sized for a gloved thumb, per MIL-STD-1472 glove guidance',
+      'Stands proud of the shell — no bore for a glove to jam in',
+      'Three raised ridges give tactile confirmation of position',
+      'Sealed membrane under the pad keeps the IP rating',
+    ],
+    focus: F(-3.7, 0, 1.4, [-2.4, 0.7, 1.9]),
+  },}
 
 /* ------------------------------------------------------------------ */
 /*  Label callouts                                                     */
@@ -829,8 +896,10 @@ export const LABELS: LabelDef[] = [
   { id: 'audio-adc', text: 'AUDIO CODEC', anchor: [-1.85, 0.53, 0.35], dir: [-2.4, 1.9, 1.1] },
   { id: 'power-mgmt', text: 'POWER MANAGEMENT', anchor: [-2.85, 0.53, -0.3], dir: [-2.8, 1.4, -1.2] },
   { id: 'battery', text: 'BATTERY', anchor: [-0.3, -0.7, 1.4], dir: [-0.6, -2.0, 2.2] },
-  { id: 'sos-button', text: 'SOS BUTTON', anchor: [-2.35, 1.3, -0.85], dir: [-3.0, 1.6, -1.6] },
-  { id: 'mark-button', text: 'MARK BUTTON', anchor: [-2.35, 1.24, 0.45], dir: [-3.4, 1.1, 1.5] },
+  { id: 'sos-button', text: 'SOS BUTTON', anchor: [-2.45, 1.6, -0.95], dir: [-3.2, 1.9, -1.7] },
+  { id: 'mark-button', text: 'MARK BUTTON', anchor: [-2.45, 1.58, 0.95], dir: [-3.6, 1.3, 1.6] },
+  { id: 'speaker-grille', text: 'SPEAKER GRILLE', anchor: [0, -0.55, -2.6], dir: [-1.4, -1.0, -3.4] },
+  { id: 'ptt-button', text: 'PTT PAD', anchor: [-3.78, 0, 1.4], dir: [-4.6, 0.8, 2.0] },
   { id: 'status-leds', text: 'STATUS LED', anchor: [1.25, 1.32, -1.86], dir: [1.6, 1.3, -2.6] },
   { id: 'audio-jack', text: 'AUDIO OUTPUT', anchor: [3.5, 0.4, 0.55], dir: [2.2, 1.5, 1.6] },
   { id: 'radio-cable', text: 'RADIO INTERFACE', anchor: [6.0, 8.0, 0.72], dir: [-2.6, 1.4, 1.6] },

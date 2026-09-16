@@ -29,6 +29,9 @@ export const PART_PARENT: Record<string, string> = {
   'mark-button': 'upper-enclosure',
   'power-switch': 'upper-enclosure',
   'acoustic-mesh': 'upper-enclosure',
+  'speaker-grille': 'lower-enclosure',
+  'speaker-driver': 'lower-enclosure',
+  'ptt-button': 'lower-enclosure',
   'acoustic-duct': 'upper-enclosure',
   'acoustic-gasket': 'upper-enclosure',
 
@@ -585,6 +588,13 @@ export const P = React.forwardRef<THREE.Mesh, PProps>(function P(
       if (s2.size === 0) PART_OBJECTS.delete(id)
     }
   }, [id])
+
+  /* dev-only QA hook: lets a headless browser inspect the live part registry */
+  const DEV = (import.meta as unknown as { env?: { DEV?: boolean } }).env?.DEV
+  if (DEV && typeof window !== 'undefined') {
+    ;(window as unknown as Record<string, unknown>).__parts = PART_OBJECTS
+    ;(window as unknown as Record<string, unknown>).__THREE = THREE
+  }
 
   /* own offset + every ancestor's offset, so children ride with their parent */
   const offset = resolveOffset(id, partOffsets, offsetFade)

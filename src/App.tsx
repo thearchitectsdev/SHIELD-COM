@@ -62,6 +62,15 @@ const TREE: Node[] = [
     ],
   },
   {
+    id: 'speaker-grille',
+    label: 'External Hardware',
+    children: [
+      { id: 'speaker-grille', label: 'Water-Shedding Speaker Grille' },
+      { id: 'speaker-driver', label: 'Speaker Driver' },
+      { id: 'ptt-button', label: 'PTT Pad (Side)' },
+    ],
+  },
+  {
     id: 'light-pipes',
     label: 'Status Indicators',
     children: [
@@ -857,7 +866,7 @@ const MODES: { id: Mode; label: string; icon: string; hint: string }[] = [
 function DemoTimeline() {
   const { demoT, setDemoPaused, demoPaused, seekDemo, setDemo, restartRef, demoChapter } = useViewer()
   return (
-    <div className="panel w-[min(880px,94vw)] px-3 py-2.5">
+    <div className="panel w-[min(520px,92vw)] px-3 py-2.5">
       <div className="flex items-center gap-2">
         <span className="chip amber">
           <span className="pulse inline-block h-1.5 w-1.5 rounded-full bg-amber-400" /> DEMO
