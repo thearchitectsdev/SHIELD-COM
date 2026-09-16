@@ -134,21 +134,6 @@ export const PARTS: Record<string, PartInfo> = {
     ],
     focus: F(2.85, 0.0, -1.85, [1.0, 0.6, 1.0]),
   },
-  'mounting-bracket': {
-    name: 'MOUNTING BRACKET',
-    branch: 'Mechanical › Mounting Brackets',
-    kind: 'hardware',
-    func: 'Detachable stainless bracket that clamps SHIELD-COM to a vest, MOLLE/PALS webbing, harness strap or the host-radio belt clip.',
-    loc: 'Underside of the lower enclosure, Y = −14.1 … −12.5 mm.',
-    role: 'The mounting / interface mechanism that makes SHIELD-COM an add-on accessory rather than a handheld device.',
-    details: [
-      '1.4 mm stainless steel, black oxide finish',
-      '2× M3 × 6 mm into threaded inserts in the base',
-      'Spring-steel PALS retention arms, 25 mm webbing pitch',
-      'Removable without opening the enclosure',
-    ],
-    focus: F(0.2, -1.35, 0, [0.9, -0.2, 1.0]),
-  },
   'threaded-inserts': {
     name: 'THREADED INSERTS',
     branch: 'Mechanical › Fastening',
@@ -849,7 +834,6 @@ export const LABELS: LabelDef[] = [
   { id: 'status-leds', text: 'STATUS LED', anchor: [1.25, 1.32, -1.86], dir: [1.6, 1.3, -2.6] },
   { id: 'audio-jack', text: 'AUDIO OUTPUT', anchor: [3.5, 0.4, 0.55], dir: [2.2, 1.5, 1.6] },
   { id: 'radio-cable', text: 'RADIO INTERFACE', anchor: [6.0, 8.0, 0.72], dir: [-2.6, 1.4, 1.6] },
-  { id: 'mounting-bracket', text: 'MOUNTING BRACKET', anchor: [0.2, -1.4, 1.0], dir: [0.4, -2.2, 1.8] },
   { id: 'host-radio', text: 'SOLDIER RADIO (HOST) · 230 mm', anchor: [14.35, 12.0, 0], dir: [2.6, 1.6, 2.0] },
 ]
 

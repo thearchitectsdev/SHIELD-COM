@@ -8,3 +8,5 @@ model.zip
 .env
 .env.*
 !.env.example
+.vercel
+.env*

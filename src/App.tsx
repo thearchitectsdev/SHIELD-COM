@@ -85,7 +85,6 @@ const TREE: Node[] = [
       { id: 'screws', label: 'Screws' },
       { id: 'standoffs', label: 'Standoffs' },
       { id: 'threaded-inserts', label: 'Threaded Inserts' },
-      { id: 'mounting-bracket', label: 'Mounting Bracket' },
       { id: 'cable-management', label: 'Cable Management' },
     ],
   },

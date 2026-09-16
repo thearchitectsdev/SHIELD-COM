@@ -160,7 +160,6 @@ const LABEL_EX: Record<string, [number, number, number]> = {
   'status-leds': [0, 0.55, 0],
   'audio-jack': [0, -2.5, 0],
   'radio-cable': [0, 0, 0],
-  'mounting-bracket': [0, -3.8, 0],
 }
 const LABEL_PX: Record<string, [number, number, number]> = {
   'main-pcb': [0, -0.45, 0],

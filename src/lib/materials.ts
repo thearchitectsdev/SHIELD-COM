@@ -2,6 +2,10 @@ export type MatSpec = {
   color: string
   roughness?: number
   metalness?: number
+  /* lacquer layer — reads as anodised / painted metal instead of raw plastic */
+  clearcoat?: number
+  clearcoatRoughness?: number
+  envIntensity?: number
   emissive?: string
   emissiveIntensity?: number
   opacity?: number
@@ -9,15 +13,16 @@ export type MatSpec = {
 }
 
 export const M: Record<string, MatSpec> = {
-  /* ---- enclosure (premium graphite technical polymer) ---- */
-  shell: { color: '#23262a', roughness: 0.66, metalness: 0.08 },
-  shellTop: { color: '#2b2f34', roughness: 0.6, metalness: 0.1 },
-  shellIn: { color: '#17191c', roughness: 0.85, metalness: 0.03 },
-  shellTrim: { color: '#3a3f45', roughness: 0.42, metalness: 0.35 },
-  seam: { color: '#0b0d0f', roughness: 0.9, metalness: 0.0 },
-  rubber: { color: '#141619', roughness: 0.96, metalness: 0.0 },
-  gasket: { color: '#1a1d22', roughness: 0.99 },
-  bumper: { color: '#1b1e21', roughness: 0.93 },
+  /* ---- enclosure (dense, machined-graphite look: metallic base coat
+          under a thin satin lacquer, so it reads as hardware, not plastic) ---- */
+  shell: { color: '#2b2f33', roughness: 0.42, metalness: 0.46, clearcoat: 0.45, clearcoatRoughness: 0.22, envIntensity: 1.05 },
+  shellTop: { color: '#33383d', roughness: 0.38, metalness: 0.5, clearcoat: 0.52, clearcoatRoughness: 0.18, envIntensity: 1.1 },
+  shellIn: { color: '#191c1f', roughness: 0.78, metalness: 0.18, clearcoat: 0.14, clearcoatRoughness: 0.4 },
+  shellTrim: { color: '#4a5057', roughness: 0.26, metalness: 0.88, clearcoat: 0.3, clearcoatRoughness: 0.12, envIntensity: 1.2 },
+  seam: { color: '#090b0c', roughness: 0.9, metalness: 0.05 },
+  rubber: { color: '#141619', roughness: 0.94, metalness: 0.02 },
+  gasket: { color: '#1a1d22', roughness: 0.97, metalness: 0.03 },
+  bumper: { color: '#1b1e21', roughness: 0.9, metalness: 0.06, clearcoat: 0.18, clearcoatRoughness: 0.55 },
 
   /* ---- pcb (matte-black flagship soldermask, ENIG gold) ---- */
   pcb: { color: '#10241c', roughness: 0.5, metalness: 0.08 },
@@ -43,9 +48,9 @@ export const M: Record<string, MatSpec> = {
   steel: { color: '#9aa1a8', roughness: 0.24, metalness: 0.94 },
   darkSteel: { color: '#666d74', roughness: 0.3, metalness: 0.88 },
   brass: { color: '#b9954a', roughness: 0.28, metalness: 0.92 },
-  darkPoly: { color: '#1c1f24', roughness: 0.55, metalness: 0.16 },
-  frame: { color: '#262b2f', roughness: 0.62, metalness: 0.1 },
-  frameAlt: { color: '#2e3439', roughness: 0.62, metalness: 0.1 },
+  darkPoly: { color: '#1e2227', roughness: 0.48, metalness: 0.3, clearcoat: 0.22, clearcoatRoughness: 0.3 },
+  frame: { color: '#282d31', roughness: 0.5, metalness: 0.38, clearcoat: 0.24, clearcoatRoughness: 0.3 },
+  frameAlt: { color: '#30363b', roughness: 0.5, metalness: 0.38, clearcoat: 0.24, clearcoatRoughness: 0.3 },
 
   /* ---- audio ---- */
   mic: { color: '#26292e', roughness: 0.6, metalness: 0.35 },

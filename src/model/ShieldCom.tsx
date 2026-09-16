@@ -27,7 +27,6 @@ import {
   LightPipes,
   MarkButton,
   Microphones,
-  MountingBracket,
   PowerSwitch,
   Screws,
   SosButton,
@@ -142,9 +141,6 @@ export function ShieldCom() {
       </Assy>
       <Assy ex={[0, -2.95, 0]}>
         <ThreadedInserts />
-      </Assy>
-      <Assy ex={[0, -3.8, 0]}>
-        <MountingBracket />
       </Assy>
 
       {/* ============ EXTERNAL INTERFACES ============ */}

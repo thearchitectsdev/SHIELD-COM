@@ -119,24 +119,6 @@ export function ThreadedInserts() {
   )
 }
 
-export function MountingBracket() {
-  return (
-    <group>
-      <Box id="mounting-bracket" mat={M.darkSteel} size={[2.6, 0.16, 1.6]} position={[0.2, -1.33, 0]} />
-      <Box id="mounting-bracket" mat={M.darkSteel} size={[0.22, 0.6, 1.6]} position={[-0.9, -1.71, 0]} />
-      <Box id="mounting-bracket" mat={M.darkSteel} size={[0.22, 0.6, 1.6]} position={[1.3, -1.71, 0]} />
-      <Box id="mounting-bracket" mat={M.darkSteel} size={[0.5, 0.14, 1.6]} position={[-0.9, -2.08, 0]} />
-      <Box id="mounting-bracket" mat={M.darkSteel} size={[0.5, 0.14, 1.6]} position={[1.3, -2.08, 0]} />
-      {[-0.75, 1.15].map((x, i) => (
-        <group key={i}>
-          <Cyl id="mounting-bracket" mat={M.steel} r={0.13} h={0.42} position={[x, -1.26, 0]} />
-          <Cyl id="mounting-bracket" mat={M.steel} r={0.22} h={0.08} position={[x, -1.51, 0]} />
-        </group>
-      ))}
-    </group>
-  )
-}
-
 export function CableManagement() {
   const clips: [number, number][] = [
     [-2.55, 1.88],

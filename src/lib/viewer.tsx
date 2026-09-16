@@ -34,7 +34,6 @@ export const PART_PARENT: Record<string, string> = {
 
   /* ── lower shell carries the external interfaces ────────────────── */
   'audio-jack': 'lower-enclosure',
-  'mounting-bracket': 'lower-enclosure',
   gasket: 'lower-enclosure',
 
   /* ── internal frame carries the whole electronics stack ─────────── */
@@ -458,20 +457,32 @@ function PartMaterial({
     matRef.current.emissiveIntensity = base * (0.72 + 0.28 * (0.5 + 0.5 * Math.sin(clock.elapsedTime * 1.6 + phase)))
   })
 
+  /* lacquered parts get a physical material — the clearcoat layer is what
+     separates "machined hardware" from "moulded plastic" under studio light */
+  const lacquered = (spec.clearcoat ?? 0) > 0 && !dim
+  const Mat: React.ElementType = lacquered ? 'meshPhysicalMaterial' : 'meshStandardMaterial'
+
   return (
-    <meshStandardMaterial
+    <Mat
       ref={matRef}
       color={color}
       roughness={dim ? 0.95 : (spec.roughness ?? 0.6)}
       metalness={dim ? 0.02 : (spec.metalness ?? 0.1)}
-      emissive={active ? '#3ea6ff' : hover ? '#1d5f96' : dim ? '#000000' : (spec.emissive ?? '#000000')}
+      emissive={active ? '#c98f3a' : hover ? '#7a5a20' : dim ? '#000000' : (spec.emissive ?? '#000000')}
       emissiveIntensity={active ? 0.85 : hover ? 0.45 : dim ? 0 : (spec.emissiveIntensity ?? 0)}
       transparent={transparent}
       opacity={opacity}
       depthWrite={!transparent || opacity > 0.55}
       clippingPlanes={clip ? planes : undefined}
       side={THREE.DoubleSide}
-      envMapIntensity={dim ? 0.2 : 0.85}
+      envMapIntensity={dim ? 0.2 : (spec.envIntensity ?? 0.9)}
+      {...(lacquered
+        ? {
+            clearcoat: spec.clearcoat,
+            clearcoatRoughness: spec.clearcoatRoughness ?? 0.2,
+            reflectivity: 0.6,
+          }
+        : null)}
     />
   )
 }
