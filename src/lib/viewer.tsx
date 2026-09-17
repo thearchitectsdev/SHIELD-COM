@@ -11,6 +11,7 @@ import * as THREE from 'three'
 import { useFrame, useThree } from '@react-three/fiber'
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import { M, type MatSpec } from './materials'
+import { visibleInPcb } from './parts'
 import { DragCtl, consumeClick, hitGizmo } from './dragmove'
 
 export type Mode = 'assembled' | 'exploded' | 'pcb' | 'slice' | 'internal'
@@ -560,6 +561,7 @@ export const P = React.forwardRef<THREE.Mesh, PProps>(function P(
 ) {
   const { selected, hovered, setSelected, setHovered, mode, partOffsets, offsetFade, freeMove } = useViewer()
   const isRadio = id === 'host-radio'
+  const hidden = mode === 'pcb' && !visibleInPcb(id)
   const active = selected === id
   const hover = hovered === id
   const dim = selected !== null && !active && !isRadio
@@ -574,7 +576,11 @@ export const P = React.forwardRef<THREE.Mesh, PProps>(function P(
   React.useImperativeHandle(ref, () => inner.current as THREE.Mesh)
   useEffect(() => {
     const o = inner.current
-    if (!o) return
+    if (!o) {
+      /* not rendered this pass — don't leave a stale entry behind */
+      PART_OBJECTS.delete(id)
+      return
+    }
     let set = PART_OBJECTS.get(id)
     if (!set) {
       set = new Set<THREE.Object3D>()
@@ -587,7 +593,7 @@ export const P = React.forwardRef<THREE.Mesh, PProps>(function P(
       s2.delete(o)
       if (s2.size === 0) PART_OBJECTS.delete(id)
     }
-  }, [id])
+  }, [id, hidden])
 
   /* dev-only QA hook: lets a headless browser inspect the live part registry */
   const DEV = (import.meta as unknown as { env?: { DEV?: boolean } }).env?.DEV
@@ -595,6 +601,9 @@ export const P = React.forwardRef<THREE.Mesh, PProps>(function P(
     ;(window as unknown as Record<string, unknown>).__parts = PART_OBJECTS
     ;(window as unknown as Record<string, unknown>).__THREE = THREE
   }
+
+  /* PCB-ONLY hides the whole module except the board and its components */
+  if (hidden) return null
 
   /* own offset + every ancestor's offset, so children ride with their parent */
   const offset = resolveOffset(id, partOffsets, offsetFade)

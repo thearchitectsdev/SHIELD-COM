@@ -885,6 +885,35 @@ export type LabelDef = {
   dir: [number, number, number]
 }
 
+/*  Parts that stay on screen when the view is switched to PCB-ONLY.
+    Everything else in the module is hidden, but the host radio and its
+    cable stay: they are the context the board plugs into, not parts of
+    SHIELD-COM.                                                          */
+export const PCB_ASSEMBLY = new Set([
+  'main-pcb',
+  'pcb-bottom',
+  'esp32',
+  'esp32-shield',
+  'audio-adc',
+  'audio-dac',
+  'analog-filter',
+  'power-mgmt',
+  'buck-reg',
+  'ldo-reg',
+  'inductor',
+  'flash',
+  'crystal',
+  'passives',
+  'esd-protection',
+  'test-points',
+  'usb-c',
+  'battery-connector',
+  'io-header',
+  'status-leds',
+])
+
+export const visibleInPcb = (id: string) => PCB_ASSEMBLY.has(id) || id === 'host-radio' || id === 'radio-cable'
+
 export const LABELS: LabelDef[] = [
   { id: 'upper-enclosure', text: 'UPPER ENCLOSURE', anchor: [-0.4, 1.42, 0.2], dir: [-0.2, 1.7, 0.9] },
   { id: 'lower-enclosure', text: 'LOWER ENCLOSURE', anchor: [-1.6, -1.25, -1.4], dir: [-1.9, -1.5, -0.6] },

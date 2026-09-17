@@ -4,7 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { ContactShadows, Html, Line, OrbitControls } from '@react-three/drei'
 import { Bloom, EffectComposer, Vignette } from '@react-three/postprocessing'
 import { AnimController, Assy, StudioEnv, useViewer, HOME_POS, HOME_TGT, PRODUCT_POS, PRODUCT_TGT } from './lib/viewer'
-import { LABELS, PARTS, FLOW } from './lib/parts'
+import { LABELS, PARTS, FLOW, visibleInPcb } from './lib/parts'
 import { ShieldCom } from './model/ShieldCom'
 import { Dimensions } from './model/Dimensions'
 import { FreeMoveGizmo } from './model/FreeMoveGizmo'
@@ -304,11 +304,12 @@ function Callout({
 }
 
 export function Labels() {
-  const { labels } = useViewer()
+  const { labels, mode } = useViewer()
   if (!labels) return null
+  const shown = mode === 'pcb' ? LABELS.filter((l) => visibleInPcb(l.id)) : LABELS
   return (
     <group>
-      {LABELS.map((l, i) => (
+      {shown.map((l, i) => (
         <Callout key={l.id} n={i + 1} {...l} />
       ))}
     </group>

@@ -4,7 +4,7 @@ import { Canvas } from '@react-three/fiber'
 import { useProgress } from '@react-three/drei'
 import Scene, { CHAPTERS, DEMO_END } from './Scene'
 import { HOME_POS, HOME_TGT, useViewer, ViewerProvider, type Mode } from './lib/viewer'
-import { FLOW, PARTS } from './lib/parts'
+import { FLOW, PARTS, visibleInPcb } from './lib/parts'
 
 /* ================================================================== */
 /*  assembly hierarchy                                                 */
@@ -1049,6 +1049,13 @@ function Shell() {
     assembleAll,
   } = useViewer()
 
+  /* switching view drops the selection if that part is about to vanish */
+  const chooseMode = (m: Mode) => {
+    setMode(m)
+    assembleAll()
+    if (m === 'pcb' && selected && !visibleInPcb(selected)) setSelected(null)
+  }
+
   const [ready, setReady] = useState(false)
   const modeHint = MODES.find((m) => m.id === mode)?.hint ?? ""
   const sel = selected ? PARTS[selected] : null
@@ -1128,24 +1135,19 @@ function Shell() {
       const k = e.key.toLowerCase()
       if (k === 'escape') setSelected(null)
       else if (k === '1') {
-        setMode('assembled')
-        assembleAll()
+        chooseMode('assembled')
       }
       else if (k === '2') {
-        setMode('exploded')
-        assembleAll()
+        chooseMode('exploded')
       }
       else if (k === '3') {
-        setMode('slice')
-        assembleAll()
+        chooseMode('slice')
       }
       else if (k === '4') {
-        setMode('pcb')
-        assembleAll()
+        chooseMode('pcb')
       }
       else if (k === '5') {
-        setMode('internal')
-        assembleAll()
+        chooseMode('internal')
       }
       else if (k === 'f') setPcbFace(pcbFace === 'top' ? 'bottom' : 'top')
       else if (k === 'i') setIsolate(!isolate)
@@ -1341,8 +1343,7 @@ function Shell() {
                     title={m.hint}
                     onClick={() => {
                       setOption(null)
-                      setMode(m.id)
-                      assembleAll()
+                      chooseMode(m.id)
                     }}
                     className={`btn ${mode === m.id ? 'on' : ''}`}
                   >
