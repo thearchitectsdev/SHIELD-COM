@@ -57,7 +57,13 @@ export function Standoffs() {
         [-2.85, -1.85],
         [-2.85, 1.35],
       ].map(([x, z], i) => (
-        <Cyl key={i} id="standoffs" mat={M.brass} r={0.18} h={0.58} seg={6} position={[x, -0.01, z]} />
+        <group key={i}>
+          <Cyl id="standoffs" mat={M.brass} r={0.18} h={0.58} seg={6} position={[x, -0.01, z]} />
+          {/* through-bore for the screw, plus a flange at each end */}
+          <Cyl id="standoffs" mat={M.sosDark} r={0.085} h={0.6} position={[x, -0.01, z]} />
+          <Cyl id="standoffs" mat={M.brass} r={0.22} h={0.035} seg={6} position={[x, -0.295, z]} />
+          <Cyl id="standoffs" mat={M.brass} r={0.22} h={0.035} seg={6} position={[x, 0.275, z]} />
+        </group>
       ))}
     </group>
   )
@@ -80,14 +86,28 @@ export function Screws() {
     <group>
       {corners.map(([x, z], i) => (
         <group key={i}>
+          {/* shank, with thread bands cut into it */}
           <Cyl id="screws" mat={M.steel} r={0.1} h={2.19} position={[x, -0.045, z]} />
+          {[-0.6, -0.3, 0.0, 0.3].map((y, j) => (
+            <Cyl key={j} id="screws" mat={M.darkSteel} r={0.118} h={0.022} position={[x, y, z]} />
+          ))}
+          {/* washer, head, chamfered rim and hex socket */}
+          <Cyl id="screws" mat={M.steel} r={0.26} h={0.03} position={[x, -1.105, z]} />
           <Cyl id="screws" mat={M.steel} r={0.2} h={0.08} position={[x, -1.18, z]} />
+          <Cyl id="screws" mat={M.darkSteel} r={0.21} h={0.018} position={[x, -1.213, z]} />
+          <Cyl id="screws" mat={M.sosDark} r={0.105} h={0.03} seg={6} position={[x, -1.196, z]} />
         </group>
       ))}
       {pcb.map(([x, z], i) => (
         <group key={`p${i}`}>
           <Cyl id="screws" mat={M.steel} r={0.09} h={0.54} position={[x, 0.17, z]} />
+          {[0.0, 0.2, 0.4].map((y, j) => (
+            <Cyl key={j} id="screws" mat={M.darkSteel} r={0.106} h={0.02} position={[x, y, z]} />
+          ))}
+          <Cyl id="screws" mat={M.steel} r={0.23} h={0.025} position={[x, 0.4525, z]} />
           <Cyl id="screws" mat={M.steel} r={0.17} h={0.07} position={[x, 0.475, z]} />
+          <Cyl id="screws" mat={M.darkSteel} r={0.18} h={0.016} position={[x, 0.503, z]} />
+          <Cyl id="screws" mat={M.sosDark} r={0.09} h={0.03} seg={6} position={[x, 0.488, z]} />
         </group>
       ))}
     </group>
@@ -142,8 +162,16 @@ export function Battery() {
   return (
     <group>
       <Box id="battery" mat={M.batt} size={[4.2, 0.56, 2.8]} position={[-0.3, -0.7, 0]} />
+      {/* PVC shrink sleeve: wrap seam, end caps and a rating label */}
       <Box id="battery" mat={M.battWrap} size={[4.22, 0.06, 2.82]} position={[-0.3, -0.7, 0]} />
-      <Box id="battery" mat={M.silver} size={[0.1, 0.3, 1.2]} position={[-2.41, -0.7, 0]} />
+      <Box id="battery" mat={M.battWrap} size={[0.03, 0.58, 2.82]} position={[-0.3, -0.7, 0]} />
+      <Box id="battery" mat={M.battWrap} size={[4.24, 0.58, 0.02]} position={[-0.3, -0.7, 1.4]} />
+      <Box id="battery" mat={M.label} size={[2.6, 0.005, 1.5]} position={[-0.1, -0.419, 0]} />
+      <Box id="battery" mat={M.battWrap} size={[1.0, 0.005, 0.22]} position={[1.0, -0.419, -0.5]} />
+      {/* nickel terminal tabs, positive and negative */}
+      <Box id="battery" mat={M.silver} size={[0.08, 0.3, 0.5]} position={[-2.42, -0.7, 0.7]} />
+      <Box id="battery" mat={M.silver} size={[0.08, 0.3, 0.5]} position={[-2.42, -0.7, -0.7]} />
+      <Box id="battery" mat={M.kapton} size={[0.02, 0.34, 0.62]} position={[-2.39, -0.7, 0]} />
       {/* protection module bonded to the cell */}
       <Box id="protection-circuit" mat={M.pcb} size={[0.12, 0.5, 1.6]} position={[-2.52, -0.7, 0]} />
       <Box id="protection-circuit" mat={M.ic} size={[0.14, 0.1, 0.34]} position={[-2.52, -0.55, 0.35]} />
